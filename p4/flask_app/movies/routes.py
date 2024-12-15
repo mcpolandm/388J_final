@@ -4,8 +4,8 @@ from flask import Blueprint, render_template, url_for, redirect, request, flash
 from flask_login import current_user
 
 from .. import movie_client
-from ..forms import MovieReviewForm, SearchForm
-from ..models import User, Review
+from ..forms import MovieReviewForm, SearchForm, MovieRatingForm
+from ..models import User, Review, Rating
 from ..utils import current_time
 
 movies = Blueprint("movies", __name__)
@@ -46,11 +46,23 @@ def movie_detail(movie_id):
     except ValueError as e:
         return render_template("movie_detail.html", error_msg=str(e))
 
-    form = MovieReviewForm()
-    if form.validate_on_submit():
+    form_review = MovieReviewForm()
+    form_rating = MovieRatingForm()
+    if form_rating.is_submitted():
+        print("HERE")
+        rating = Rating(
+            rating=form_rating.movieRating.data,
+            imdb_id=movie_id,
+        )
+
+        rating.save()
+
+        return redirect(request.path)
+    
+    if form_review.validate_on_submit():
         review = Review(
             commenter=current_user._get_current_object(),
-            content=form.text.data,
+            content=form_review.text.data,
             date=current_time(),
             imdb_id=movie_id,
             movie_title=result.title,
@@ -61,9 +73,15 @@ def movie_detail(movie_id):
         return redirect(request.path)
 
     reviews = Review.objects(imdb_id=movie_id)
+    ratings = Rating.objects(imdb_id=movie_id)
+    avg = 0
+    for rating in ratings:
+        avg += rating.rating
+    if len(ratings) > 0:
+        avg = avg/(len(ratings))
 
     return render_template(
-        "movie_detail.html", form=form, movie=result, reviews=reviews
+        "movie_detail.html", form_review=form_review, movie=result, reviews=reviews, rating=avg, form_rating=form_rating
     )
 
 

@@ -29,3 +29,7 @@ class Review(db.Document):
     movie_title = db.StringField(required=True, min_length=1, max_length=100)
     image = db.StringField()
     #Uncomment when other fields are ready for review pictures
+
+class Rating(db.Document):
+    rating = db.IntField(required=True)
+    imdb_id = db.StringField(required=True, min_length=9, max_length=9)
