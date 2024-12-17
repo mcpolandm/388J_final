@@ -30,19 +30,12 @@ class SpotifyClient(object):
         search_results = self.sess.get(self.base_url, headers=self.headers, params=params)
         search_results = search_results.json()
 
-        album_ids = list(map(lambda x: x["id"], search_results["albums"]["items"]))
-        albums = []
-        n = len(album_ids)
-        for i in range(n):
-            album = self.sess.get(f'https://api.spotify.com/v1/albums/{album_ids[i]}', headers=self.headers, params={'market': 'US'})
-            album = album.json()
-            album_object = {
-                'id': album["id"],
-                'name': album["name"],
-                'image': album["images"][0],
-                'release_date': album["release_date"]
-            }
-            albums.append(album_object)
+        albums = list(map(lambda x: {
+            'id': x["id"],
+            'name': x["name"],
+            'image': x["images"][0],
+            'release_date': x["release_date"]
+        }, search_results["albums"]["items"]))
 
         return albums
 
