@@ -1,12 +1,37 @@
+import os, requests
+from requests import get
 import base64,io
 from io import BytesIO
-from flask import Blueprint, render_template, url_for, redirect, request, flash
+from flask import Flask, Blueprint, json, render_template, url_for, redirect, request, flash, session
 from flask_login import current_user
 
 from .. import movie_client
 from ..forms import MovieReviewForm, SearchForm, MovieRatingForm
 from ..models import User, Review, Rating
 from ..utils import current_time
+
+from spotipy import Spotify
+from spotipy import SpotifyOAuth
+from spotipy.cache_handler import FlaskSessionCacheHandler
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = os.urandom(64)
+
+client_id = '5817050472aa40e488cfe5e5d80dd6be'
+client_secret = 'a6327884a1fd428683b2e5ec2ebfa3d8'
+redirect_uri = 'http://localhost:5000/callback'
+scope = 'playlist-read-private'
+
+cache_handler = FlaskSessionCacheHandler(session)
+sp_oauth = SpotifyOAuth(
+    client_id=client_id,
+    client_secret=client_secret,
+    redirect_uri=redirect_uri,
+    scope=scope,
+    cache_handler=cache_handler,
+    show_dialog=True
+)
+sp = Spotify(auth_manager=sp_oauth)
 
 movies = Blueprint("movies", __name__)
 """ ************ Helper for pictures uses username to get their profile picture************ """
@@ -18,10 +43,19 @@ def get_b64_img(username):
 
 """ ************ View functions ************ """
 
+@movies.route('/callback')
+def callback():
+    sp_oauth.get_access_token(request.args['code'])
+    return redirect(url_for('movies.index'))
+
 
 @movies.route("/", methods=["GET", "POST"])
 def index():
     form = SearchForm()
+
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()):
+        auth_url = sp_oauth.get_authorize_url()
+        return redirect(auth_url)
 
     if form.validate_on_submit():
         return redirect(url_for("movies.query_results", query=form.search_query.data))
