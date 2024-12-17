@@ -11,15 +11,14 @@
 {# Display card for the movie details #}
 <div class="movie-container">
   <ul class="movie-info">
-    <div class="movie-title"> {{ movie.title }}
-      <p class="movie-date"> &middot; {{ movie.year }}</p>
+    <div class="movie-title"> {{ movie.name }}
     </div>
-    <img class="movie-img" alt="alt text" src="{{ movie.poster_url }}" />
-    <li class="opacity-100 md:px-4"><b>Average Rating:</b> {{ rating }} Stars</li>
-    <li class="opacity-40 md:px-4"><b>Directed by:</b> {{ movie.director }}</li>
-    <li class="opacity-40 md:px-4"><b>Actors:</b> {{ movie.actors }}</li>
-    <li class="opacity-40 md:px-4"><b>Genres:</b> {{ movie.genres }}</li>
-    <li class="opacity-40 md:px-4"><b>Awards:</b> {{ movie.awards }}</li>
+    <img class="movie-img" alt="alt text" src="{{ movie.image.url }}" />
+    <li class="opacity-100 md:px-4"><b>Released: </b> {{ movie.release_date }} </li>
+    <li class="opacity-40 md:px-4"><b>Artist:</b> {{ movie.artist_name }}</li>
+    <li class="opacity-40 md:px-4"><b>Total Tracks:</b> {{ movie.total_tracks }}</li>
+    <li class="opacity-40 md:px-4"><b>Popularity:</b> {{ movie.popularity }}</li>
+    <li class="md:px-4"><a href="{{movie.url}}">Link to Album</a></li>
   </ul>
 
   {# Reviews #}

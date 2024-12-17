@@ -38,6 +38,22 @@ class SpotifyClient(object):
         }, search_results["albums"]["items"]))
 
         return albums
+     
+     def get_album_details(self, id):
+         params = { 'market': 'US' }
+         album = self.sess.get(f'https://api.spotify.com/v1/albums/{id}', headers=self.headers, params=params)
+         album = album.json()
+         album_object = {
+             "id": album["id"],
+             "artist_name": album["artists"][0]["name"],
+             "name": album["name"],
+             "total_tracks": album["total_tracks"],
+             "image": album["images"][0],
+             "release_date": album["release_date"],
+             "url": album["external_urls"]["spotify"],
+             "popularity": album["popularity"],
+         }
+         return album_object
 
 
 class MovieClient(object):

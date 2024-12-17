@@ -79,8 +79,9 @@ def query_results(query):
 
 @movies.route("/movies/<movie_id>", methods=["GET", "POST"])
 def movie_detail(movie_id):
+    spotify_client = SpotifyClient(sp_oauth.get_access_token()['access_token'])
     try:
-        result = movie_client.retrieve_movie_by_id(movie_id)
+        result = spotify_client.get_album_details(movie_id)
     except ValueError as e:
         return render_template("movie_detail.html", error_msg=str(e))
 
