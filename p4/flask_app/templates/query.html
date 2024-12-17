@@ -13,10 +13,9 @@
     href="{{ url_for('movies.movie_detail', movie_id=result.imdb_id) }}"
     class="group movie-card"
   >
-    <img src="{{ result.poster_url }}" class="movie-card-img" alt="missing" />
-    <h5 class="movie-card-content"> {{ result.title }}
-      <span class="text-neutral-400 font-normal"> &middot; {{ result.year }} </span>
-    </h5>
+    <img src="{{ result.image.url }}" class="movie-card-img" alt="missing" />
+    <h4 class="movie-card-content"> {{ result.name }}</h4>
+    <h5 class="movie-card-content"> Released: {{ result.release_date }} </h5>
   </a>
   {% endfor %}
 </div>

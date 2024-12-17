@@ -19,6 +19,33 @@ class Movie(object):
     def __repr__(self):
         return self.title
 
+class SpotifyClient(object):
+     def __init__(self, api_key):
+        self.sess = requests.Session()
+        self.base_url = 'https://api.spotify.com/v1/search'
+        self.headers = { 'Authorization': f"Bearer {api_key}" }
+    
+     def search(self, search_string):
+        params = { 'q': search_string, 'type': 'album', 'limit': '30' }
+        search_results = self.sess.get(self.base_url, headers=self.headers, params=params)
+        search_results = search_results.json()
+
+        album_ids = list(map(lambda x: x["id"], search_results["albums"]["items"]))
+        albums = []
+        n = len(album_ids)
+        for i in range(n):
+            album = self.sess.get(f'https://api.spotify.com/v1/albums/{album_ids[i]}', headers=self.headers, params={'market': 'US'})
+            album = album.json()
+            album_object = {
+                'id': album["id"],
+                'name': album["name"],
+                'image': album["images"][0],
+                'release_date': album["release_date"]
+            }
+            albums.append(album_object)
+
+        return albums
+
 
 class MovieClient(object):
     def __init__(self, api_key):

@@ -14,6 +14,8 @@ from spotipy import Spotify
 from spotipy import SpotifyOAuth
 from spotipy.cache_handler import FlaskSessionCacheHandler
 
+from ..client import SpotifyClient
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(64)
 
@@ -32,6 +34,7 @@ sp_oauth = SpotifyOAuth(
     show_dialog=True
 )
 sp = Spotify(auth_manager=sp_oauth)
+spotify_client: SpotifyClient
 
 movies = Blueprint("movies", __name__)
 """ ************ Helper for pictures uses username to get their profile picture************ """
@@ -65,8 +68,9 @@ def index():
 
 @movies.route("/search-results/<query>", methods=["GET"])
 def query_results(query):
+    spotify_client = SpotifyClient(sp_oauth.get_access_token()['access_token'])
     try:
-        results = movie_client.search(query)
+        results = spotify_client.search(query)
     except ValueError as e:
         return render_template("query.html", error_msg=str(e))
 
