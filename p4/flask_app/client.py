@@ -24,6 +24,11 @@ class SpotifyClient(object):
         self.sess = requests.Session()
         self.base_url = 'https://api.spotify.com/v1/search'
         self.headers = { 'Authorization': f"Bearer {api_key}" }
+
+     def get_current_user(self):
+        user = self.sess.get('https://api.spotify.com/v1/me', headers=self.headers)
+        user = user.json()["display_name"]
+        return user
     
      def search(self, search_string):
         params = { 'q': search_string, 'type': 'album', 'limit': '30' }

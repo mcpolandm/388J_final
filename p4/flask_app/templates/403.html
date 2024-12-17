@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block header %}
+<nav class="navbar flex w-full justify-between z-40">
+    <a class="m-5 navlink">
+        <span class="hidden sm:block">Spotify Songs</span>
+        <span class="block sm:hidden">Home</span>
+    </a>
+    <a href="{{ auth_url }}">
+        <div class="flex">
+            <span class="my-5 mr-5 ml-0 navlink">Login</span>
+        </div>
+    </a>
+</nav>
+<h1>Login to access page</h1>
+{% endblock %}

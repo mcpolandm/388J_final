@@ -6,19 +6,19 @@
   </b>
 {% endif %}
 
-{% if movie %}
+{% if album %}
 
-{# Display card for the movie details #}
+{# Display card for the album details #}
 <div class="movie-container">
   <ul class="movie-info">
-    <div class="movie-title"> {{ movie.name }}
+    <div class="movie-title"> {{ album.name }}
     </div>
-    <img class="movie-img" alt="alt text" src="{{ movie.image.url }}" />
-    <li class="opacity-100 md:px-4"><b>Released: </b> {{ movie.release_date }} </li>
-    <li class="opacity-40 md:px-4"><b>Artist:</b> {{ movie.artist_name }}</li>
-    <li class="opacity-40 md:px-4"><b>Total Tracks:</b> {{ movie.total_tracks }}</li>
-    <li class="opacity-40 md:px-4"><b>Popularity:</b> {{ movie.popularity }}</li>
-    <li class="md:px-4"><a href="{{movie.url}}">Link to Album</a></li>
+    <img class="movie-img" alt="alt text" src="{{ album.image.url }}" />
+    <li class="opacity-100 md:px-4"><b>Released: </b> {{ album.release_date }} </li>
+    <li class="opacity-40 md:px-4"><b>Artist:</b> {{ album.artist_name }}</li>
+    <li class="opacity-40 md:px-4"><b>Total Tracks:</b> {{ album.total_tracks }}</li>
+    <li class="opacity-40 md:px-4"><b>Popularity:</b> {{ album.popularity }}</li>
+    <li class="md:px-4"><a href="{{album.url}}">Link to Album</a></li>
   </ul>
 
   {# Reviews #}

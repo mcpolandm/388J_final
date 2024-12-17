@@ -32,7 +32,7 @@ bcrypt = Bcrypt()
 movie_client = MovieClient(OMDB_API_KEY)
 
 from .users.routes import users
-from .movies.routes import movies
+from .movies.routes import albums
 
 def custom_404(e):
     return render_template("404.html"), 404
@@ -50,7 +50,7 @@ def create_app(test_config=None):
     bcrypt.init_app(app)
 
     app.register_blueprint(users)
-    app.register_blueprint(movies)
+    app.register_blueprint(albums)
     app.register_error_handler(404, custom_404)
 
     login_manager.login_view = "users.login"

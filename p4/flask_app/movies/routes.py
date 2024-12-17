@@ -34,9 +34,9 @@ sp_oauth = SpotifyOAuth(
     show_dialog=True
 )
 sp = Spotify(auth_manager=sp_oauth)
-spotify_client: SpotifyClient
+spotify_client = None
 
-movies = Blueprint("movies", __name__)
+albums = Blueprint("albums", __name__)
 """ ************ Helper for pictures uses username to get their profile picture************ """
 def get_b64_img(username):
     user = User.objects(username=username).first()
@@ -46,13 +46,19 @@ def get_b64_img(username):
 
 """ ************ View functions ************ """
 
-@movies.route('/callback')
+@albums.route('/callback')
 def callback():
+    if request.args.get('error') == 'access_denied':
+        auth_url = sp_oauth.get_authorize_url()
+        return render_template('403.html', auth_url=auth_url)
+    
+    global spotify_client
     sp_oauth.get_access_token(request.args['code'])
-    return redirect(url_for('movies.index'))
+    spotify_client = SpotifyClient(sp_oauth.get_access_token()['access_token'])
+    return redirect(url_for('albums.index'))
 
 
-@movies.route("/", methods=["GET", "POST"])
+@albums.route("/", methods=["GET", "POST"])
 def index():
     form = SearchForm()
 
@@ -61,29 +67,27 @@ def index():
         return redirect(auth_url)
 
     if form.validate_on_submit():
-        return redirect(url_for("movies.query_results", query=form.search_query.data))
+        return redirect(url_for("albums.query_results", query=form.search_query.data))
+    
+    return render_template("index.html", form=form, name=sp.me()["display_name"], auth_url=sp_oauth.get_authorize_url())
 
-    return render_template("index.html", form=form)
 
-
-@movies.route("/search-results/<query>", methods=["GET"])
+@albums.route("/search-results/<query>", methods=["GET"])
 def query_results(query):
-    spotify_client = SpotifyClient(sp_oauth.get_access_token()['access_token'])
     try:
         results = spotify_client.search(query)
     except ValueError as e:
-        return render_template("query.html", error_msg=str(e))
+        return render_template("query.html", error_msg=str(e), name=sp.me()["display_name"], auth_url=sp_oauth.get_authorize_url())
 
-    return render_template("query.html", results=results)
+    return render_template("query.html", results=results, name=sp.me()["display_name"], auth_url=sp_oauth.get_authorize_url())
 
 
-@movies.route("/movies/<movie_id>", methods=["GET", "POST"])
-def movie_detail(movie_id):
-    spotify_client = SpotifyClient(sp_oauth.get_access_token()['access_token'])
+@albums.route("/albums/<album_id>", methods=["GET", "POST"])
+def album_detail(album_id):
     try:
-        result = spotify_client.get_album_details(movie_id)
+        result = spotify_client.get_album_details(album_id)
     except ValueError as e:
-        return render_template("movie_detail.html", error_msg=str(e))
+        return render_template("album_detail.html", error_msg=str(e), name=sp.me()["display_name"], auth_url=sp_oauth.get_authorize_url())
 
     form_review = MovieReviewForm()
     form_rating = MovieRatingForm()
@@ -91,7 +95,7 @@ def movie_detail(movie_id):
         print("HERE")
         rating = Rating(
             rating=form_rating.movieRating.data,
-            imdb_id=movie_id,
+            imdb_id=album_id,
             commenter=current_user._get_current_object(),
             date=current_time(),
         )
@@ -105,7 +109,7 @@ def movie_detail(movie_id):
             commenter=current_user._get_current_object(),
             content=form_review.text.data,
             date=current_time(),
-            imdb_id=movie_id,
+            imdb_id=album_id,
             movie_title=result['name'],
         )
 
@@ -113,8 +117,8 @@ def movie_detail(movie_id):
 
         return redirect(request.path)
 
-    reviews = Review.objects(imdb_id=movie_id)
-    ratings = Rating.objects(imdb_id=movie_id)
+    reviews = Review.objects(imdb_id=album_id)
+    ratings = Rating.objects(imdb_id=album_id)
     avg = 0
     for rating in ratings:
         avg += rating.rating
@@ -122,18 +126,6 @@ def movie_detail(movie_id):
         avg = avg/(len(ratings))
     print(avg)
     return render_template(
-        "movie_detail.html", form_review=form_review, movie=result, reviews=reviews, rating=avg, form_rating=form_rating, ratings = ratings
+        "album_detail.html", form_review=form_review, album=result, reviews=reviews, rating=avg, form_rating=form_rating, ratings = ratings, 
+        name=sp.me()["display_name"], auth_url=sp_oauth.get_authorize_url()
     )
-
-
-@movies.route("/user/<username>")
-def user_detail(username):
-    #uncomment to get review image
-    #user = find first match in db
-    user = User.objects(username=username).first()
-    if (user == None):
-        return render_template("user_detail.html", error="User does not exist!")
-    img = get_b64_img(user.username)
-    reviews = Review.objects(commenter=user)
-    
-    return render_template("user_detail.html", username=username, reviews=reviews, image=img)
