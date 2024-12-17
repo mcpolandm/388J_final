@@ -87,11 +87,13 @@ def movie_detail(movie_id):
 
     form_review = MovieReviewForm()
     form_rating = MovieRatingForm()
-    if form_rating.is_submitted():
+    if form_rating.validate_on_submit():
         print("HERE")
         rating = Rating(
             rating=form_rating.movieRating.data,
             imdb_id=movie_id,
+            commenter=current_user._get_current_object(),
+            date=current_time(),
         )
 
         rating.save()
@@ -104,7 +106,7 @@ def movie_detail(movie_id):
             content=form_review.text.data,
             date=current_time(),
             imdb_id=movie_id,
-            movie_title=result.title,
+            movie_title=result['name'],
         )
 
         review.save()
@@ -118,9 +120,9 @@ def movie_detail(movie_id):
         avg += rating.rating
     if len(ratings) > 0:
         avg = avg/(len(ratings))
-
+    print(avg)
     return render_template(
-        "movie_detail.html", form_review=form_review, movie=result, reviews=reviews, rating=avg, form_rating=form_rating
+        "movie_detail.html", form_review=form_review, movie=result, reviews=reviews, rating=avg, form_rating=form_rating, ratings = ratings
     )
 
 
