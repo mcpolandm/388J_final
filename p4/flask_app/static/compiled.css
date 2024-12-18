@@ -1450,3 +1450,25 @@ html {
     width: 33.333333%;
   }
 }
+
+.songs-container {
+  display:table;
+  width:100%;
+  height:auto;
+  margin:10px 0px;
+  hr {
+    color: red;
+  }
+}
+
+.songs-container .text {
+  display:table-cell;
+  height:100%;
+  vertical-align:middle;
+  font-size: 30px;
+}
+
+.songs-container img {
+  display:block;
+  float:right;
+}

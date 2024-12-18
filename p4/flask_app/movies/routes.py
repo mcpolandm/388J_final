@@ -22,7 +22,7 @@ app.config['SECRET_KEY'] = os.urandom(64)
 client_id = '5817050472aa40e488cfe5e5d80dd6be'
 client_secret = 'a6327884a1fd428683b2e5ec2ebfa3d8'
 redirect_uri = 'http://localhost:5000/callback'
-scope = 'playlist-read-private'
+scope = ['user-top-read']
 
 cache_handler = FlaskSessionCacheHandler(session)
 sp_oauth = SpotifyOAuth(
@@ -31,7 +31,7 @@ sp_oauth = SpotifyOAuth(
     redirect_uri=redirect_uri,
     scope=scope,
     cache_handler=cache_handler,
-    show_dialog=True
+    show_dialog=True,
 )
 sp = Spotify(auth_manager=sp_oauth)
 spotify_client = None
@@ -71,6 +71,17 @@ def index():
     
     return render_template("index.html", form=form, name=sp.me()["display_name"], auth_url=sp_oauth.get_authorize_url())
 
+@albums.route("/top-songs", methods=["GET"])
+def top_songs():
+    top_songs = sp.current_user_top_tracks(5)
+    top_songs = list(map(lambda x: {
+        "name": x["name"],
+        "artist": x["artists"][0]["name"],
+        "image": x["album"]["images"][0]["url"]
+
+    }, top_songs["items"]))
+
+    return render_template("top_songs.html", top_songs=top_songs, name=sp.me()["display_name"], auth_url=sp_oauth.get_authorize_url())
 
 @albums.route("/search-results/<query>", methods=["GET"])
 def query_results(query):

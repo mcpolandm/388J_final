@@ -5,7 +5,7 @@
         <span class="block sm:hidden">Home</span>
     </a>
     <div class="flex">
-        <span class="my-5 mr-5 ml-0 navlink">Account: {{name}}</span>
+        <a class="my-5 mr-5 ml-0 navlink" href="{{ url_for('albums.top_songs') }}">Account: {{name}}</a>
         <a class="my-5 mr-5 ml-0 navlink !bg-red-400/20 hover:!bg-red-500/50 !text-red-400 hover:!text-red-300" href="{{ auth_url }}">Logout</a>
     </div>
 </nav>

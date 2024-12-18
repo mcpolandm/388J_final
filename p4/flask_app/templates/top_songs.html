@@ -1,0 +1,17 @@
+{% extends "header.html" %} {% block content %}
+<div class="main-container">
+  <div class="decoration-main-container"><div class="decoration-main"></div></div>
+  <h2 class="main-title"> Top 5 Songs </h2>
+  <hr>
+  {% for song in top_songs %}
+    <div class="songs-container">
+        <div class="text">
+            <div style="font-weight: 700;">{{loop.index}}. {{song.name}}</div>
+            <div>Artist: {{song.artist}}</div>
+        </div>
+        <img src="{{song.image}}" width="400">
+    </div>
+    <hr>
+  {% endfor %}
+</div>
+{% endblock %}

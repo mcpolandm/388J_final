@@ -59,7 +59,7 @@ class SpotifyClient(object):
              "popularity": album["popularity"],
          }
          return album_object
-
+     
 
 class MovieClient(object):
     def __init__(self, api_key):
