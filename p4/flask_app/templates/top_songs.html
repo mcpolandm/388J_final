@@ -1,6 +1,18 @@
 {% extends "header.html" %} {% block content %}
 <div class="main-container">
   <div class="decoration-main-container"><div class="decoration-main"></div></div>
+
+  <div class="flex justify-center">
+
+    {# Link to see all of the current user's reviews #}
+
+    <a href="{{ url_for('albums.user_detail', username=current_user.username) }}" class="review-button">
+
+        All Reviews
+
+    </a>
+
+</div>
   <h2 class="main-title"> Top 5 Songs </h2>
   <hr>
   {% for song in top_songs %}

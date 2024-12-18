@@ -40,7 +40,7 @@
           <li class="rating-item">
             <div class="rating-date">{{ r.date }}</div>
             {% if r.commenter %}
-              <a class="rating-user" href="{{ url_for('movies.user_detail', username=r.commenter.username) }}">
+              <a class="rating-user" href="{{ url_for('albums.user_detail', username=r.commenter.username) }}">
                 @{{ r.commenter.username }}
               </a>
             {% endif %}
@@ -61,7 +61,7 @@
           <img class="h-20 w-20 rounded-lg" src="data:image/png;base64,{{review.image}}" alt="" />
           <div class="w-full">
             <span class="review-date">{{ review.date }}</span>
-            <a class="review-commenter" href="{{ url_for('movies.user_detail', username=review.commenter.username) }}">
+            <a class="review-commenter" href="{{ url_for('albums.user_detail', username=review.commenter.username) }}">
               @{{ review.commenter.username }}
             </a>
             <p class="review-content">{{ review.content }}</p>

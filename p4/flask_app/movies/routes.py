@@ -38,11 +38,25 @@ spotify_client = None
 
 albums = Blueprint("albums", __name__)
 """ ************ Helper for pictures uses username to get their profile picture************ """
+
 def get_b64_img(username):
     user = User.objects(username=username).first()
-    bytes_im = io.BytesIO(user.profile_pic.read())
-    image = base64.b64encode(bytes_im.getvalue()).decode()
-    return image
+    
+    sp_user_data = sp.me()
+    spotify_profile_pic_url = sp_user_data.get("images", [{}])[0].get("url")
+    
+    if spotify_profile_pic_url:
+        image_data = requests.get(spotify_profile_pic_url).content
+        return base64.b64encode(image_data).decode()
+    
+    if user.profile_pic:
+        bytes_im = io.BytesIO(user.profile_pic.read())
+        image = base64.b64encode(bytes_im.getvalue()).decode()
+        return image
+    
+    print("none")
+    return None  
+
 
 """ ************ View functions ************ """
 
@@ -99,7 +113,8 @@ def album_detail(album_id):
         result = spotify_client.get_album_details(album_id)
     except ValueError as e:
         return render_template("album_detail.html", error_msg=str(e), name=sp.me()["display_name"], auth_url=sp_oauth.get_authorize_url())
-
+    
+    username = sp.me()["display_name"]
     form_review = MovieReviewForm()
     form_rating = MovieRatingForm()
     if form_rating.validate_on_submit():
@@ -122,6 +137,7 @@ def album_detail(album_id):
             date=current_time(),
             imdb_id=album_id,
             movie_title=result['name'],
+            image=get_b64_img(username)
         )
 
         review.save()
@@ -138,5 +154,21 @@ def album_detail(album_id):
     print(avg)
     return render_template(
         "album_detail.html", form_review=form_review, album=result, reviews=reviews, rating=avg, form_rating=form_rating, ratings = ratings, 
-        name=sp.me()["display_name"], auth_url=sp_oauth.get_authorize_url()
+        name=username, auth_url=sp_oauth.get_authorize_url()
     )
+
+@albums.route("/user/<username>")
+def user_detail(username):
+    user = User.objects(username=username).first()
+    print("user", user)
+    if not user:
+        error_message = f"User '{username}' not found!"
+        return render_template("user_detail.html", error=error_message, user=username)
+    
+    print(username)
+    img = get_b64_img(username)
+    
+    reviews = Review.objects(commenter=user)
+    
+    return render_template("user_detail.html", username= username, user=user, reviews=reviews, image=img, error=None)
+
