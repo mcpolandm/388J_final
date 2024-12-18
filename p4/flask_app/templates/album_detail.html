@@ -1,4 +1,5 @@
-{% extends "header.html" %} {% block content %}
+{% extends "header.html" %} 
+{% block content %}
 
 {% if error_msg %}
   <b class="text-red-400">
@@ -32,7 +33,7 @@
     </form>
     
     {# Ratings display #}
-      {% if ratings %}
+    {% if ratings %}
       <h2 class="ratings-title">Individual Ratings</h2>
       <ul class="ratings-container">
         {% for r in ratings %}
@@ -44,13 +45,12 @@
               </a>
             {% endif %}
             <div class="rating-value">Rating: {{ r.rating }} Stars</div>
-            {# <div class="rating-user">By: @{{ r.commenter.username }}</div> #}
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p>No ratings yet.</p>
-      {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No ratings yet.</p>
+    {% endif %}
   
     <h1 class="reviews-title"> Reviews
       <small class="reviews-count"> {{ reviews | length }} reviews </small>
@@ -69,27 +69,27 @@
         </li>
       {% endfor %}
     </ul>
-{# #}
-    {% if current_user.is_authenticated %}
-      {# Movie review submission form #}
-      <div class="container mx-auto">
-        <form method="POST" action="" class="review-form">
-          {{ form_review.csrf_token }}
-          <div class="form-group review-input">
-            {{ form_review.text.label }} {{ form_review.text(class="form-content") }}
-            {% if form_review.text.errors %}
-              <div class="error" role="alert">
-                {% for error in form_review.text.errors %}
-                <span>{{ error }}</span>
-                {% endfor %}
-              </div>
-            {% endif %}
-          </div>
-          {{ form_review.submit(class="review-button") }}
-        </form>
-      </div>
-    {% endif %}
+
+    {# Movie review submission form always visible #}
+    <div class="container mx-auto">
+      <form method="POST" action="" class="review-form">
+        {{ form_review.csrf_token }}
+        <div class="form-group review-input">
+          {{ form_review.text.label }} {{ form_review.text(class="form-content") }}
+          {% if form_review.text.errors %}
+            <div class="error" role="alert">
+              {% for error in form_review.text.errors %}
+              <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+        {{ form_review.submit(class="review-button") }}
+      </form>
+    </div>
+    
   </div>
   <div class="w-0 lg:w-96"></div>
 </div>
-{% endif %} {% endblock content %}
+{% endif %} 
+{% endblock content %}
